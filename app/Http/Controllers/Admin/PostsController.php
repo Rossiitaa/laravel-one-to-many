@@ -38,7 +38,7 @@ class PostsController extends Controller
     public function create()
     {
         $post = new Post();
-        return view('admin.posts.create', ['post' => $post]);
+        return view('admin.posts.create', compact('post'));
     }
 
     /**
@@ -49,17 +49,16 @@ class PostsController extends Controller
      */
     public function store(Request $request)
     {
-        $sentData = $request->validate($this->validationRules);
+        $validationData = $request->validate($this->validationRules);
 
-        $newPost = new Post;
-        $lastPost = Post::orderBy('id', 'desc')->first();
-        $sentData['user_id'] = Auth::user()->id;
-        $sentData['date'] = new DateTime();
-        $sentData['id'] = $lastPost->id + 1;
+        $data = $request->all();
+        $post = new Post;
+        $data['user_id'] = Auth::id();
+        $data['date'] = new DateTime();
 
-        $newPost->create($sentData);
+        $post->create($data);
 
-        return redirect()->route('admin.posts.show')->with('message', '"'.$sentData['title'].'" has been created');
+        return redirect()->route('admin.posts.index')->with('message', '"'.$data['title'].'" has been created');
     }
 
     /**
@@ -83,7 +82,7 @@ class PostsController extends Controller
     public function edit($id)
     {
         $post = Post::findOrFail($id);
-        return view('admin.posts.edit', ['post' => $post]);
+        return view('admin.posts.edit', compact('post'));
     }
 
     /**
@@ -96,14 +95,12 @@ class PostsController extends Controller
     public function update(Request $request, $id)
     {
         $sentData = $request->validate($this->validationRules);
-        
-        $newPost = Post::firstOrFail($id);
-        $sentData['user_id'] = Auth::user()->id;
-        $sentData['date'] = $newPost->date;
-        $sentData['id'] = $newPost->id;
+        $sentData = $request->all();
+
+        $newPost = Post::findOrFail($id);
         $newPost->update($sentData);
 
-        return redirect()->route('admin.posts.show', $newPost->id)->with('message', '"'.$sentData['title'].'" has been modified');
+        return redirect()->route('admin.posts.index')->with('message', '"'.$sentData['title'].'" has been modified');
     }
 
     /**

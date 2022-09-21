@@ -6,13 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Post extends Model
 {
-    protected $fillable = [
-        'user',
+    protected $fillable = array(
+        'user_id',
         'title',
         'content',
         'date',
         'image'
-    ];
+    );
 
     public function user()
     {
