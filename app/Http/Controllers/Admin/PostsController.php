@@ -26,7 +26,7 @@ class PostsController extends Controller
      */
     public function index()
     {
-        $posts = Post::all();
+        $posts = Auth::user()->posts;
         return view('admin.posts.index', compact('posts'));
     }
 
@@ -49,17 +49,15 @@ class PostsController extends Controller
      */
     public function store(Request $request)
     {
-        $sentData = $request->all();
-
-        $request->validate($this->validationRules);
+        $sentData = $request->validate($this->validationRules);
 
         $newPost = new Post;
-        $newPost->user = Auth::user()->name;
-        $newPost->title = $sentData['title']; 
-        $newPost->content = $sentData['content']; 
-        $newPost->image = $sentData['image']; 
-        $newPost->date = new DateTime(); 
-        $newPost->save(); 
+        $lastPost = Post::orderBy('id', 'desc')->first();
+        $sentData['user_id'] = Auth::user()->id;
+        $sentData['date'] = new DateTime();
+        $sentData['id'] = $lastPost->id + 1;
+
+        $newPost->create($sentData);
 
         return redirect()->route('admin.posts.show')->with('message', '"'.$sentData['title'].'" has been created');
     }
@@ -97,11 +95,12 @@ class PostsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $request->validate($this->validationRules);
-        $sentData = $request->all();
-
-        $newPost = Post::findOrFail($id);
+        $sentData = $request->validate($this->validationRules);
         
+        $newPost = Post::firstOrFail($id);
+        $sentData['user_id'] = Auth::user()->id;
+        $sentData['date'] = $newPost->date;
+        $sentData['id'] = $newPost->id;
         $newPost->update($sentData);
 
         return redirect()->route('admin.posts.show', $newPost->id)->with('message', '"'.$sentData['title'].'" has been modified');

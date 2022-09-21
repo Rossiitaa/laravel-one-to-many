@@ -25,7 +25,7 @@
                             <tr>
                                 <td>{{ $post->id }}</td>
                                 <td><a href="{{ route("admin.posts.show", $post->id) }}">{{ $post->title }}</a></td>
-                                <td>{{ $post->user }}</td>
+                                <td>{{ $post->user->name }}</td>
                                 <td>{{ $post->date }}</td>
                                 <td class="d-flex">
                                     <a href="{{ route("admin.posts.edit", $post->id) }}" class="btn btn-sm btn-success">Edit</a>
