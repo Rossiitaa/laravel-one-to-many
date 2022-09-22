@@ -17,6 +17,7 @@
                         <td>Username</td>
                         <td>Title</td>
                         <td>Date</td>
+                        <td>Category</td>
                         <td>Edit</td>
                         <td>Delete</td>
                     </thead>
@@ -27,6 +28,12 @@
                                 <td><a href="{{ route("admin.posts.show", $post->id) }}">{{ $post->title }}</a></td>
                                 <td>{{ $post->user->name }}</td>
                                 <td>{{ $post->date }}</td>
+                                <td>
+                                    <span class="badge badge-fill p-2" style="background-color:{{ $post->category->color }}">
+                                        {{ $post->category->name }}
+                                    </span>
+                                </td>
+                                </td>
                                 <td class="d-flex">
                                     <a href="{{ route("admin.posts.edit", $post->id) }}" class="btn btn-sm btn-success">Edit</a>
                                 </td>

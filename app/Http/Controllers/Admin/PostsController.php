@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Post;
+use App\Models\Category;
 use DateTime;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -17,6 +18,7 @@ class PostsController extends Controller
         'title' => 'required|string|max:255|min:3',
         'content' => 'required|string',
         'image' => 'required|string|active_url',
+        'category_id' => 'required|integer',
     ];
 
     /**
@@ -38,7 +40,8 @@ class PostsController extends Controller
     public function create()
     {
         $post = new Post();
-        return view('admin.posts.create', compact('post'));
+        $categories = Category::all();
+        return view('admin.posts.create', compact('post', 'categories'));
     }
 
     /**
@@ -51,14 +54,16 @@ class PostsController extends Controller
     {
         $validationData = $request->validate($this->validationRules);
 
-        $data = $request->all();
-        $post = new Post;
-        $data['user_id'] = Auth::id();
-        $data['date'] = new DateTime();
+        $sentData = $request->all();
+        $newPost = new Post;
+        $sentData['user_id'] = Auth::id();
+        $sentData['date'] = new DateTime();
+        $newPost->fill($sentData);
+        $newPost->save();
 
-        $post->create($data);
+        $newPost->create($sentData);
 
-        return redirect()->route('admin.posts.index')->with('message', '"'.$data['title'].'" has been created');
+        return redirect()->route('admin.posts.index')->with('message', '"'.$sentData['title'].'" has been created');
     }
 
     /**
@@ -82,7 +87,8 @@ class PostsController extends Controller
     public function edit($id)
     {
         $post = Post::findOrFail($id);
-        return view('admin.posts.edit', compact('post'));
+        $categories = Category::all();
+        return view('admin.posts.edit', compact('post', 'categories'));
     }
 
     /**
